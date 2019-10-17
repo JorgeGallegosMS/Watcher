@@ -2,4 +2,15 @@
 
 {% block content %}
 <h1>Welcome to Watcher</h1>
+
+<div class="container">
+    <div class="row">
+        {% for game in games %}
+        <div class="col-sm-6">
+            <h2>{{ game.name }}</h2>
+            <img src="{{ game.image }}" alt="{{ game.name }}" height="350" width="550">
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock  %}
