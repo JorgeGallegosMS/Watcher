@@ -8,7 +8,7 @@
         {% for game in games %}
         <div class="col-sm-6">
             <h2>{{ game.name }}</h2>
-            <img src="{{ game.image }}" alt="{{ game.name }}" height="350" width="550">
+            <a href="/games/{{ game._id }}"><img src="{{ game.image }}" alt="{{ game.name }}" height="350" width="550">
         </div>
         {% endfor %}
     </div>

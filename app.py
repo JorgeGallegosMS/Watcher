@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
+from bson.objectid import ObjectId
 from pymongo import MongoClient
 
 load_dotenv()
@@ -11,38 +12,60 @@ host = os.environ.get('MONGODB_URI')
 client = MongoClient(host=f'{host}?retryWrites=false')
 db = client.get_default_database()
 
-# games = db.games
 
-league_of_legends = {
-    'name': 'League of Legends',
-    'image': 'https://dotesports-media.nyc3.cdn.digitaloceanspaces.com/wp-content/uploads/2019/09/12195522/league-of-legends.jpg'
-}
+games = db.games
 
-dota2 = {
-    'name': 'Dota 2',
-    'image': 'https://esportsobserver.com/wp-content/uploads/2019/05/dota-2-russia.png'
-}
+# client.drop_database(db)
 
-csgo = {
-    'name': 'Counter-Strike: Global Offensive',
-    'image': 'https://www.oratoryprepomega.org/wp-content/uploads/2018/04/Feature-Image-1-1200x1200.jpg'
-}
-rocket_league = {
-    'name': 'Rocket League',
-    'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRW64dCTYk1c662BQdDgnUsHaJeR1kdQvxOlyFOOf7zeA9zBs2m'
-}
+# league_of_legends = {
+#     'name': 'League of Legends',
+#     'image': 'https://dotesports-media.nyc3.cdn.digitaloceanspaces.com/wp-content/uploads/2019/09/12195522/league-of-legends.jpg'
+# }
 
-games = [league_of_legends, dota2, csgo, rocket_league]
+# dota2 = {
+#     'name': 'Dota 2',
+#     'image': 'https://esportsobserver.com/wp-content/uploads/2019/05/dota-2-russia.png'
+# }
+
+# csgo = {
+#     'name': 'Counter-Strike: Global Offensive',
+#     'image': 'https://www.oratoryprepomega.org/wp-content/uploads/2018/04/Feature-Image-1-1200x1200.jpg'
+# }
+# rocket_league = {
+#     'name': 'Rocket League',
+#     'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRW64dCTYk1c662BQdDgnUsHaJeR1kdQvxOlyFOOf7zeA9zBs2m'
+# }
+
+# games = [league_of_legends, dota2, csgo, rocket_league]
 
 @app.route('/')
 def index():
     """Show all games"""
-    return render_template('index.html.j2', games=games)
+    return render_template('games_index.html.j2', games=games.find())
 
 @app.route('/games/new')
 def games_new():
     """Show form for new game"""
     return render_template('games_new.html.j2')
+
+@app.route('/games', methods=['POST'])
+def games_submit():
+    """Submit game to database"""
+    game = {
+        'name': request.form.get('name'),
+        'image': request.form.get('image')
+    }
+    game_id = games.insert_one(game).inserted_id
+
+    return redirect(url_for('games_show', game_id=game_id))
+
+@app.route('/games/<game_id>')
+def games_show(game_id):
+    """Show one game"""
+    game = games.find_one({'_id': ObjectId(game_id)})
+    return render_template('games_show.html.j2', game=game)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
