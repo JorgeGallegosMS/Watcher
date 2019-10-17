@@ -39,5 +39,10 @@ def index():
     """Show all games"""
     return render_template('index.html.j2', games=games)
 
+@app.route('/games/new')
+def games_new():
+    """Show form for new game"""
+    return render_template('games_new.html.j2')
+
 if __name__ == '__main__':
     app.run(debug=True)
