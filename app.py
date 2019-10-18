@@ -12,41 +12,18 @@ host = os.environ.get('MONGODB_URI')
 client = MongoClient(host=f'{host}?retryWrites=false')
 db = client.get_default_database()
 
-
 games = db.games
-
 # client.drop_database(db)
 
-# league_of_legends = {
-#     'name': 'League of Legends',
-#     'image': 'https://dotesports-media.nyc3.cdn.digitaloceanspaces.com/wp-content/uploads/2019/09/12195522/league-of-legends.jpg'
-# }
-
-# dota2 = {
-#     'name': 'Dota 2',
-#     'image': 'https://esportsobserver.com/wp-content/uploads/2019/05/dota-2-russia.png'
-# }
-
-# csgo = {
-#     'name': 'Counter-Strike: Global Offensive',
-#     'image': 'https://www.oratoryprepomega.org/wp-content/uploads/2018/04/Feature-Image-1-1200x1200.jpg'
-# }
-# rocket_league = {
-#     'name': 'Rocket League',
-#     'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRW64dCTYk1c662BQdDgnUsHaJeR1kdQvxOlyFOOf7zeA9zBs2m'
-# }
-
-# games = [league_of_legends, dota2, csgo, rocket_league]
-
 @app.route('/')
-def index():
+def games_index():
     """Show all games"""
     return render_template('games_index.html.j2', games=games.find())
 
 @app.route('/games/new')
 def games_new():
     """Show form for new game"""
-    return render_template('games_new.html.j2')
+    return render_template('games_new.html.j2', game={}, title='New Game')
 
 @app.route('/games', methods=['POST'])
 def games_submit():
@@ -69,7 +46,7 @@ def games_show(game_id):
 def games_edit(game_id):
     """Show form to edit a game"""
     game = games.find_one({'_id': ObjectId(game_id)})
-    return render_template('games_edit.html.j2', game=game)
+    return render_template('games_edit.html.j2', game=game, title='Edit Game')
 
 @app.route('/games/<game_id>', methods=['POST'])
 def games_update(game_id):
@@ -85,6 +62,12 @@ def games_update(game_id):
     )
 
     return redirect(url_for('games_show', game_id=game_id))
+
+@app.route('/games/<game_id>/delete', methods=['POST'])
+def games_delete(game_id):
+    """Delete a game"""
+    games.delete_one({'_id': ObjectId(game_id)})
+    return redirect(url_for('games_index'))
 
 
 
