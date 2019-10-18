@@ -65,6 +65,28 @@ def games_show(game_id):
     game = games.find_one({'_id': ObjectId(game_id)})
     return render_template('games_show.html.j2', game=game)
 
+@app.route('/games/<game_id>/edit')
+def games_edit(game_id):
+    """Show form to edit a game"""
+    game = games.find_one({'_id': ObjectId(game_id)})
+    return render_template('games_edit.html.j2', game=game)
+
+@app.route('/games/<game_id>', methods=['POST'])
+def games_update(game_id):
+    """Submit updated game to database"""
+    updated_game = {
+        'name': request.form.get('name'),
+        'image': request.form.get('image')
+    }
+
+    games.update_one(
+        {'_id': ObjectId(game_id)},
+        {'$set': updated_game}
+    )
+
+    return redirect(url_for('games_show', game_id=game_id))
+
+
 
 
 if __name__ == '__main__':

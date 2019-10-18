@@ -3,6 +3,7 @@
 {% block content %}
 <div class="container">
     <h1>{{ game.name }}</h1>
+    <a href="/games/{{ game._id }}/edit">Edit</a>
     <img src="{{ game.image }}" alt="{{ game.name }}" height="80%" width="100%">
 </div>
 {% endblock %}
